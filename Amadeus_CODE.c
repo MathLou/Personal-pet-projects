@@ -61,14 +61,6 @@ void servoWriter();
 const int speedTest = 15;
 
 void setup() {
-  //MPU 6050  from https://how2electronics.com/measure-tilt-angle-mpu6050-arduino/
-  /*
-  Wire.begin();
-  Wire.beginTransmission(MPU_addr);
-  Wire.write(0x6B);
-  Wire.write(0);
-  Wire.endTransmission(false);
-  */
   Serial.begin(9600);
   //servos (A first then B)
   bethaServo1.attach(bethaPin1, 544,2400);
@@ -105,8 +97,6 @@ void loop() {
   //servoWriter();
   //semiCircleDraw();
   //servoWriter();
-  //MPU();
-  //equilibrium();
   
   for(int i=0;i<10;i++){
     warmingUp();
@@ -114,15 +104,7 @@ void loop() {
   for(int i =0;i<10;i++){
     trot();    
   }
-  
-  /*for(int i=0;i<10;i++){
-    warmingUp();
-  } 
-  for(int i =0;i<10;i++){
-    crawl();    
-  }*/
-  //warmingUp();
-  //crawl();
+  //crawl(); --> not recommended
   //stretch();
 }
 float coordinatesCompute(float X, float Y){
@@ -292,7 +274,6 @@ void joystick(){
 }
 void crawl(){
   int step =2;
-  /*
   // 3 legs on the ground at the same time
   //moving all individually then dorso moving
   for (int x = 2*rad; x>=0;x=x-step){
@@ -333,7 +314,6 @@ void crawl(){
     servoWriter(); 
     delay(speedTest);
   }
-  */
   float leg1,leg2,leg3,leg4;
   //stage 1
   for (int x = 2*rad; x>=0;x=x-step){
@@ -502,105 +482,4 @@ for (int h = 45; h<=initialHeight;h=h+step){
     delay(speed);
   }      
 }
-float MPU(){
-  /*
-Wire.beginTransmission(MPU_addr);
-Wire.write(0x3B);
-Wire.endTransmission(false);
-Wire.requestFrom(MPU_addr,14,true);
-
-AcX=Wire.read()<<8|Wire.read();
-AcY=Wire.read()<<8|Wire.read();
-AcZ=Wire.read()<<8|Wire.read();
-int yAng = map(AcY,minVal,maxVal,-90,90);
-int zAng = map(AcZ,minVal,maxVal,-90,90);
-RAD_TO_DEG * (atan2(-yAng, -zAng)+PI); 
-angle =  RAD_TO_DEG * (atan2(-yAng, -zAng)+PI);
-Serial.print("AngleX= ");
-Serial.println(angle);
-Serial.println("-----------------------------------------");
-return angle; */
-}
-void transEquilibrium(int mode){
-  //float alpha = MPU()-180; 
-  float alpha;
-  //default 
-  legHeight[1]=initialHeight;
-  legHeight[3]=initialHeight; 
-  legHeight[2]=initialHeight;
-  legHeight[0]=initialHeight;
-  /*
-  //0.8
-  int kp =0;
-  //0 for 1-3 legs doing semicircle, 1 for 2-4 doing the same
-  if(mode ==0){
-    if(alpha<0){
-      legHeight[3]= (initialHeight-kp*(51.98*tan(alpha)));
-      legHeight[1]=initialHeight;
-    }
-    else if(alpha>0){
-      legHeight[1]= initialHeight-kp*(51.98*tan(alpha));
-      legHeight[3]=initialHeight;
-    }             
-  else{
-    //legs 1 and 3 on the ground
-    if(alpha<0){
-      legHeight[0]= initialHeight-kp*(51.98*tan(alpha));
-      legHeight[2]=initialHeight;
-    }
-    else if(alpha>0){
-      legHeight[2]= initialHeight-kp*(51.98*tan(alpha));
-      legHeight[0]=initialHeight;
-    }
-  }
-}*/
-}
-void equilibrium(){
-  float alpha = MPU()-180; 
-  //default 
-  
-  //0.8
-  int kp =-0.5;
-  float argument = (initialHeight-((51.98-kp)*tan(alpha)));
-  //
-  if (argument >=39 && argument <=62){
-  if(alpha>0){
-//backlegs moving (1-4)
-    /*    
-    legHeight[3]= argument;
-    legHeight[0]= argument;
-    */
-    coordinatesCompute(rad, kp*argument);
-    bethaServo1.write(computedAngles[0]);
-    gamaServo1.write(computedAngles[1]);
-    bethaServo4.write(180-computedAngles[0]);
-    gamaServo4.write(180-computedAngles[1]);  
-    coordinatesCompute(rad, initialHeight);
-    bethaServo2.write(computedAngles[0]);
-    bethaServo3.write(180-computedAngles[0]);
-    gamaServo2.write(computedAngles[1]);
-    gamaServo3.write(180-computedAngles[1]);
-    
-  }
-  else if(alpha<0){
-//front legs moving
-/*
-  legHeight[1]= argument;
-  legHeight[2]= argument;
-  */
-    coordinatesCompute(rad, argument);
-    bethaServo2.write(computedAngles[0]);
-    bethaServo3.write(180-computedAngles[0]);
-    gamaServo2.write(computedAngles[1]);
-    gamaServo3.write(180-computedAngles[1]);
-    coordinatesCompute(rad, initialHeight);
-    bethaServo1.write(computedAngles[0]);
-    bethaServo4.write(180-computedAngles[0]);
-    gamaServo1.write(computedAngles[1]);
-    gamaServo4.write(180-computedAngles[1]);
-    
-  } 
-  }else{
-    return;
-  }              
 }
