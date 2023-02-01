@@ -104,7 +104,7 @@ void loop() {
   for(int i =0;i<10;i++){
     trot();    
   }
-  //crawl(); --> not recommended
+  //crawl(); --> not optmized
   //stretch();
 }
 float coordinatesCompute(float X, float Y){
