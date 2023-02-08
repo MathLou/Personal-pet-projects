@@ -1,13 +1,3 @@
-/*
-  Arduino Slave for Raspberry Pi Master
-  i2c_slave_ard.ino
-  Connects to Raspberry Pi via I2C
-  
-  DroneBot Workshop 2019
-  https://dronebotworkshop.com
-*/
-
-// Include the Wire library for I2C
 #include <Wire.h>
 #include <Servo.h>
 
